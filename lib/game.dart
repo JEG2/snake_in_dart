@@ -1,14 +1,18 @@
 part of snake;
 
 class Game {
+  static const MS_PER_UPDATE = 16;
+
   CanvasElement            _canvas;
   int                      width;
   int                      height;
   CanvasRenderingContext2D _context;
 
-  List<Element> _loading = new List<Element>();
+  final Set<Element> _loading = new Set<Element>();
 
   Screen screen;
+
+  num lastTimestamp;
 
   Game(String canvasSelector) {
     _canvas  = querySelector(canvasSelector);
@@ -32,8 +36,17 @@ class Game {
     return Future.wait(_loading.map((element) => element.onLoad.first));
   }
 
-  void tick([int delta = 0]) {
-    screen.render(_context, delta);
+  void tick([int timestamp]) {
+    var elapsed   = lastTimestamp != null ? timestamp - lastTimestamp
+                                          : MS_PER_UPDATE;
+    lastTimestamp = timestamp;
+
+    while (elapsed >= MS_PER_UPDATE) {
+      screen.update();
+      elapsed -= MS_PER_UPDATE;
+    }
+
+    screen.render(_context, elapsed / MS_PER_UPDATE);
 
     window.animationFrame.then(tick);
   }
