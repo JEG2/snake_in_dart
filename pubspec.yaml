@@ -1,0 +1,4 @@
+name: snake
+description: A recreation of the classic game in Dart.
+dependencies:
+  browser: any
