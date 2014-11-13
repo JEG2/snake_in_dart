@@ -1,2 +1,4 @@
 packages
 web/packages
+web/application.js*
+web/application.*.js
