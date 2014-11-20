@@ -1,7 +1,7 @@
 part of snake;
 
 class Game {
-  static const MS_PER_UPDATE = 16;
+  static const millisecondsPerUpdate = 16;
 
   CanvasElement            _canvas;
   int                      width;
@@ -14,6 +14,8 @@ class Game {
 
   num lastTimestamp;
 
+  String _status = "Loading";
+
   Game(String canvasSelector) {
     _canvas  = querySelector(canvasSelector);
     width    = _canvas.width;
@@ -21,6 +23,10 @@ class Game {
     _context = _canvas.getContext("2d");
 
     screen = new Level(this);
+  }
+
+  bool isLoading() {
+    _status == "Loading";
   }
 
   void center() {
@@ -33,20 +39,23 @@ class Game {
   }
 
   Future finishLoadingAssets() {
-    return Future.wait(_loading.map((element) => element.onLoad.first));
+    return
+      Future
+        .wait(_loading.map((element) => element.onLoad.first))
+        .then((_) => _status = "Running");
   }
 
   void tick([int timestamp]) {
     var elapsed   = lastTimestamp != null ? timestamp - lastTimestamp
-                                          : MS_PER_UPDATE;
+                                          : millisecondsPerUpdate;
     lastTimestamp = timestamp;
 
-    while (elapsed >= MS_PER_UPDATE) {
+    while (elapsed >= millisecondsPerUpdate) {
       screen.update();
-      elapsed -= MS_PER_UPDATE;
+      elapsed -= millisecondsPerUpdate;
     }
 
-    screen.render(_context, elapsed / MS_PER_UPDATE);
+    screen.render(_context, elapsed / millisecondsPerUpdate);
 
     window.animationFrame.then(tick);
   }
