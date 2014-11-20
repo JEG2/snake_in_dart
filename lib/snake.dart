@@ -16,5 +16,6 @@ part "snake_part.dart";
 part "snake_head.dart";
 part "snake_body.dart";
 part "snake_tail.dart";
+part "bird.dart";
 part "level.dart";
 part "game.dart";

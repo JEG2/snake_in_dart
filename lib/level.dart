@@ -7,13 +7,17 @@ class Level extends Screen {
   static final ImageElement _background =
     new ImageElement(src: "images/sand.jpg");
 
-  bool snakeAlive    = true;
-  num  snakeVelocity = 2;  // must divide evenly into Level.gridSize
+  static final Random rng = new Random();
+
+  bool      snakeAlive    = true;
+  num       snakeVelocity = 2;  // must divide evenly into Level.gridSize
+  SnakeHead snakeHead;
 
   Level(_game) : super(_game) {
     _game.loadAsset(_background);
     _addCacti();
     _addSnake();
+    addBird();
   }
 
   void update() {
@@ -70,10 +74,10 @@ class Level extends Screen {
     var centerX = _game.width  / gridSize ~/ 2 * gridSize;
     var centerY = _game.height / gridSize ~/ 2 * gridSize;
     var q       = new Map<Point, int>();
-    var head    = new SnakeHead(
+    var tail    = new SnakeTail(
         _game,
         this,
-        new Point(centerX + gridSize, centerY),
+        new Point(centerX - gridSize, centerY),
         gridCell,
         0,
         q
@@ -86,21 +90,52 @@ class Level extends Screen {
         0,
         q
     );
-    var tail    = new SnakeTail(
+    snakeHead   = new SnakeHead(
         _game,
         this,
-        new Point(centerX - gridSize, centerY),
+        new Point(centerX + gridSize, centerY),
         gridCell,
         0,
-        q
+        q,
+        tail
     );
 
-    q[head.locationInGrid()] = 0;
-    q[body.locationInGrid()] = 0;
-    q[tail.locationInGrid()] = 0;
+    q[snakeHead.locationInGrid()] = 0;
+    q[body.locationInGrid()]      = 0;
+    q[tail.locationInGrid()]      = 0;
 
-    addActor(head);
+    addActor(snakeHead);
     addActor(body);
     addActor(tail);
+  }
+
+  void addBird() {
+    var location;
+    var i = 1;
+
+    for (var x = 1; x < _game.width ~/ gridSize - 1; x++) {
+      for (var y = 1; y < _game.height ~/ gridSize - 1; y++) {
+        var gridLocation = new Point(x, y);
+        var snakePresent = _actors.any( (actor) =>
+            actor is SnakePart && actor.locationInGrid() == gridLocation
+        );
+        if (!snakePresent) {
+          if (rng.nextDouble() < 1.0 / i) {
+            location = new Point(x * gridSize, y * gridSize);
+          }
+          i++;
+        }
+      }
+    }
+
+    if (location != null) {
+      snakeHead.bird = new Bird(_game, this, location, gridCell);
+      addScenery(snakeHead.bird);
+    }
+  }
+
+  void removeBirdAndReadd() {
+    _scenery.removeLast();
+    addBird();
   }
 }

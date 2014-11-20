@@ -9,10 +9,12 @@ class SnakeHead extends SnakePart {
 
   final DoubleLinkedQueue<int> _inputs = new DoubleLinkedQueue<int>();
 
-  int   _previousAngle = 0;
-  Point _previousGridLocation;
+  int       _previousAngle = 0;
+  Point     _previousGridLocation;
+  Bird      bird;
+  SnakeTail _tail;
 
-  SnakeHead(_game, _screen, _location, _size, _angle, _q) :
+  SnakeHead(_game, _screen, _location, _size, _angle, _q, this._tail) :
     super(_game, _screen, _location, _size, _snake_head, _angle, _q) {
     _previousGridLocation = locationInGrid();
 
@@ -26,6 +28,7 @@ class SnakeHead extends SnakePart {
 
     var currentLocation = locationInGrid();
     _handleDeath(currentLocation);
+    _eatBirds(currentLocation);
     _makeTurns();
     _updateMoveQ(currentLocation);
   }
@@ -40,18 +43,27 @@ class SnakeHead extends SnakePart {
   }
 
   void _handleDeath(Point currentLocation) {
-    if (_angle == 0 && _location.x % Level.gridSize != 0) {
-      currentLocation = new Point(currentLocation.x + 1, currentLocation.y);
-    } else if (_angle == 90 && _location.y % Level.gridSize != 0) {
-      currentLocation = new Point(currentLocation.x, currentLocation.y + 1);
-    }
-
+    currentLocation = _alignInGrid(currentLocation);
     _screen._scenery.forEach( (scenery) {
-      if (currentLocation == locationInGrid(scenery._location)) {
-        _image            = _dead;
-        _level.snakeAlive = false;
+      if ( scenery is Cactus &&
+           currentLocation == locationInGrid(scenery._location) ) {
+        _die();
       }
     } );
+    _screen._actors.skip(1).forEach( (actor) {
+      if (currentLocation == locationInGrid(actor._location)) {
+        _die();
+      }
+    } );
+  }
+
+  void _eatBirds(Point currentLocation) {
+    currentLocation = _alignInGrid(currentLocation);
+    if (locationInGrid(bird._location) == currentLocation) {
+      bird == null;
+      _level.removeBirdAndReadd();
+      _tail.addBody();
+    }
   }
 
   void _makeTurns() {
@@ -79,6 +91,21 @@ class SnakeHead extends SnakePart {
       _q[currentLocation]   = _angle;
       _previousGridLocation = currentLocation;
     }
+  }
+
+  Point _alignInGrid(Point currentLocation) {
+    if (_angle == 0 && _location.x % Level.gridSize != 0) {
+      return new Point(currentLocation.x + 1, currentLocation.y);
+    } else if (_angle == 90 && _location.y % Level.gridSize != 0) {
+      return new Point(currentLocation.x, currentLocation.y + 1);
+    } else {
+      return currentLocation;
+    }
+  }
+
+  void _die() {
+    _image            = _dead;
+    _level.snakeAlive = false;
   }
 
   num _calculateImageRotation() {
