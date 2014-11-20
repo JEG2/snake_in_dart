@@ -9,11 +9,13 @@ class Level extends Screen {
 
   static final Random rng = new Random();
 
-  bool      snakeAlive    = true;
-  num       snakeVelocity = 2;  // must divide evenly into Level.gridSize
+  bool      snakeAlive = true;
+  num       snakeVelocity;  // must divide evenly into Level.gridSize
   SnakeHead snakeHead;
 
-  Level(_game) : super(_game) {
+  Level(_game, this.snakeVelocity) : super(_game) {
+    assert(gridSize % snakeVelocity == 0);
+
     _game.loadAsset(_background);
     _addCacti();
     _addSnake();

@@ -22,7 +22,7 @@ class Game {
     height   = _canvas.height;
     _context = _canvas.getContext("2d");
 
-    screen = new Level(this);
+    screen = new Menu(this);
   }
 
   bool isLoading() {
