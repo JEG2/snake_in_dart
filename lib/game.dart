@@ -30,7 +30,7 @@ class Game {
   }
 
   void center() {
-    var marginToCenter      = ((window.innerHeight - height) / 2).toInt();
+    var marginToCenter      = (window.innerHeight - height) ~/ 2;
     _canvas.style.marginTop = "${marginToCenter}px";
   }
 
