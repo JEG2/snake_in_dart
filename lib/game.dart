@@ -26,11 +26,11 @@ class Game {
   }
 
   bool isLoading() {
-    _status == "Loading";
+    return _status == "Loading";
   }
 
   void center() {
-    var marginToCenter      = ((window.innerHeight - height) / 2).toInt();
+    var marginToCenter      = (window.innerHeight - height) ~/ 2;
     _canvas.style.marginTop = "${marginToCenter}px";
   }
 
