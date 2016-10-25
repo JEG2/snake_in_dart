@@ -50,18 +50,29 @@ class SnakePart extends Actor {
   }
 
   Point _calculateNewLocation() {
+    Point result;
     switch (_angle) {
       case 0:
-        return new Point(_location.x + _level.snakeVelocity, _location.y);
+        result =  new Point(_location.x + _level.snakeVelocity, _location.y);
+        break;
+
       case 90:
-        return new Point(_location.x, _location.y + _level.snakeVelocity);
+        result = new Point(_location.x, _location.y + _level.snakeVelocity);
+        break;
+
       case 180:
-        return new Point(_location.x - _level.snakeVelocity, _location.y);
+        result = new Point(_location.x - _level.snakeVelocity, _location.y);
+        break;
+
       case 270:
-        return new Point(_location.x, _location.y - _level.snakeVelocity);
+        result = new Point(_location.x, _location.y - _level.snakeVelocity);
+        break;
+
       default:
-        print("Bad angle error");
+        throw new Exception("Bad angle $_angle");
     }
+
+    return result;
   }
 
   num _degreesToRadians(num degrees) {
