@@ -26,7 +26,7 @@ class Game {
   }
 
   bool isLoading() {
-    _status == "Loading";
+    return _status == "Loading";
   }
 
   void center() {
